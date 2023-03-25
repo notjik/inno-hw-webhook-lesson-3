@@ -6,12 +6,13 @@
 
 # Imports for working with a bot
 import os
-import re
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 from dotenv import load_dotenv
+from text_utils import ansi_color, ansi_effect, logging
+from db import Database
 
 # Loading environment variables
 load_dotenv()
@@ -28,87 +29,6 @@ except TypeError:
     exit('Create local variables')
 dispatcher = Dispatcher(bot)
 
-# ANSI EFFECT CODE
-ansi_effect = {
-    'break': '\033[0m',
-    'bold': '\033[1m',
-    'fade': '\033[2m',
-    'italic': '\033[3m',
-    'underline': '\033[4m',
-    'rflash': '\033[5m',
-    'fflash': '\033[6m',
-    'cbgtx': '\033[7m',
-    'crossout': '\033[8m',
-    'dunderline': '\033[21m',
-    'framed': '\033[51m',
-    'circled': '\033[52m',
-    'overlined': '\033[53m',
-}
-
-# ANSI COLOR CODE
-ansi_color = {
-    'black': {
-        'text': '\033[30m',
-        'background': '\033[40m',
-    },
-    'red': {
-        'text': '\033[31m',
-        'background': '\033[41m',
-    },
-    'green': {
-        'text': '\033[32m',
-        'background': '\033[42m',
-    },
-    'yellow': {
-        'text': '\033[33m',
-        'background': '\033[43m',
-    },
-    'blue': {
-        'text': '\033[34m',
-        'background': '\033[44m',
-    },
-    'purple': {
-        'text': '\033[35m',
-        'background': '\033[45m',
-    },
-    'turquoise': {
-        'text': '\033[36m',
-        'background': '\033[46m',
-    },
-    'white': {
-        'text': '\033[37m',
-        'background': '\033[47m',
-    },
-}
-
-
-def logging(message: types.Message,
-            type_content: str,
-            content: str) -> None:
-    """
-    Procedure for logging actions with the bot to the console.
-    :param message: message object
-    :param type_content: str name type content
-    :param content: str content
-    :return: None
-    """
-    log = '{}{}[{}]{} in {}{}{} send {}{}{}: \n{}{}{}\n'.format(ansi_color['blue']['text'] + ansi_effect['bold'],
-                                                                message.from_user.username,
-                                                                message.from_user.id,
-                                                                ansi_effect['break'] + ansi_color['blue']['text'],
-                                                                ansi_color['yellow']['text'],
-                                                                message.date,
-                                                                ansi_effect['break'] + ansi_color['blue']['text'],
-                                                                ansi_color['yellow']['text'],
-                                                                type_content,
-                                                                ansi_effect['break'] + ansi_color['blue']['text'],
-                                                                ansi_color['turquoise']['text'] + ansi_effect['italic'],
-                                                                content,
-                                                                ansi_effect['break'])
-    with open('logging.log', 'a', encoding="utf-8") as logfile:
-        logfile.writelines(re.sub(r'\033\[\d+m', r'', log))  # Logging message in logfile
-    print(log)  # Logging message in console
-
 
 async def startup(callback):
     """
@@ -117,14 +37,28 @@ async def startup(callback):
     :param callback: dispatcher object
     :return: None
     """
-    me = await callback.bot.get_me()
+    global db
+    table_template = {
+        'users': [
+            {
+                'name': 'id',
+                'desc': 'INT',
+            },
+            {
+                'name': 'name',
+                'desc': 'TEXT',
+            }
+        ]
+    }
+    db = Database('webhook-3.db', table_template)
+    me = await callback.bot.get_me()  # Request information about the bot
     print('{}The {}{}[{}]{} has been successfully launched.{}\n'.format(
         ansi_color['green']['text'],
         ansi_effect['bold'],
         me.username, me.id,
         ansi_effect['break'] + ansi_color['green']['text'],
         ansi_effect['break']))  # Logging message
-    await bot.delete_webhook()
+    await bot.set_webhook(WEBHOOK_URL)
 
 
 async def shutdown(callback):
@@ -134,7 +68,9 @@ async def shutdown(callback):
     :param callback: dispatcher object
     :return: None
     """
+    global db
     me = await callback.bot.get_me()  # Request information about the bot
+    del db
     print('\n{}The {}{}[{}]{} is disabled.{}'.format(
         ansi_color['green']['text'],
         ansi_effect['bold'],
@@ -142,6 +78,38 @@ async def shutdown(callback):
         ansi_effect['break'] + ansi_color['green']['text'],
         ansi_effect['break']))  # Logging message
     await bot.delete_webhook()
+
+
+@dispatcher.message_handler(commands=['start'])
+async def start_message(msg: types.Message):
+    """
+    The starting message of the bot
+
+    :param msg: message object
+    :return: answer
+    """
+    global db
+    elems = {
+        'user_id': msg.from_user.id,
+        'username': msg.from_user.username,
+        'firstname': msg.from_user.first_name,
+        'lastname': msg.from_user.last_name,
+        'locale': msg.from_user.locale.territory_name
+    }
+    db.add('table', elems)
+    await msg.answer('Hi! Welcome to the bot from the webhooks homework of Innopolis University. \n',
+                     'This is an echo bot.')  # Request with a message to the user
+
+
+@dispatcher.message_handler(commands=['help'])
+async def help_message(msg: types.Message):
+    """
+    The help message of the bot
+
+    :param msg: message object
+    :return: answer
+    """
+    await msg.answer("Just send me a message and I'll repeat it!")  # Request with a message to the user
 
 
 @dispatcher.message_handler(content_types=['any'])
@@ -168,5 +136,4 @@ if __name__ == '__main__':
         on_startup=startup,
         on_shutdown=shutdown,
         skip_updates=True,
-    )
-# Launching the bot
+    )  # Launching webhook
