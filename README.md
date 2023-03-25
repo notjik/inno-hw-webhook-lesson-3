@@ -4,9 +4,9 @@
 <strong>English</strong>
 </summary>
 
-# Informatics
+# Bot from the lesson of the course "Code Future" of Innopolis University
 
-## School homeworks and classworks
+## [@innopolistwebhook2bot](https://t.me/innopolistwebhook2bot)
 
 ---
 
@@ -18,9 +18,9 @@
 <strong>Русский</strong>
 </summary>
 
-# Информатика
+# Бот из урока курса "Код будущего" Университета Иннополис
 
-## Школьные домашние задания и классные работы
+## [@innopolistwebhook2bot](https://t.me/innopolistwebhook2bot)
 
 ---
 
