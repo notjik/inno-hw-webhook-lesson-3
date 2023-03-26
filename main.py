@@ -42,11 +42,23 @@ async def startup(callback):
         'users': [
             {
                 'name': 'id',
-                'desc': 'INT',
+                'desc': 'integer primary key autoincrement not null',
             },
             {
-                'name': 'name',
-                'desc': 'TEXT',
+                'name': 'user_id',
+                'desc': 'integer unique',
+            },
+            {
+                'name': 'username',
+                'desc': 'text',
+            },
+            {
+                'name': 'firstname',
+                'desc': 'text',
+            },
+            {
+                'name': 'lastname',
+                'desc': 'text',
             }
         ]
     }
@@ -94,10 +106,10 @@ async def start_message(msg: types.Message):
         'username': msg.from_user.username,
         'firstname': msg.from_user.first_name,
         'lastname': msg.from_user.last_name,
-        'locale': msg.from_user.locale.territory_name
     }
-    db.add('table', elems)
-    await msg.answer('Hi! Welcome to the bot from the webhooks homework of Innopolis University. \n',
+    db.add('users', elems)
+    logging(msg, '/start', '{}'.format(msg))
+    await msg.answer('Hi! Welcome to the bot from the webhooks homework of Innopolis University. \n'
                      'This is an echo bot.')  # Request with a message to the user
 
 
@@ -109,6 +121,7 @@ async def help_message(msg: types.Message):
     :param msg: message object
     :return: answer
     """
+    logging(msg, '/help', '{}'.format(msg))
     await msg.answer("Just send me a message and I'll repeat it!")  # Request with a message to the user
 
 

@@ -7,9 +7,7 @@ from text_utils import ansi_color, ansi_effect
 class Database:
     def __init__(self,
                  db_name: str,
-                 table_template: dict[str, list[dict[str, str]]] | str,
-                 *,
-                 unique: list[str] = []) -> None:
+                 table_template: dict[str, list[dict[str, str]]] | str) -> None:
         self.conn = sqlite3.connect(db_name)
         self.cur = self.conn.cursor()
         if isinstance(table_template, dict):
@@ -22,8 +20,6 @@ class Database:
                         +
                         ',\n'.join(
                             '{} {}'.format(row['name'], row['desc']) for row in table_template[key])
-                        +
-                        ('Unique({})'.format(', '.join(unique)) if unique else '')
                         +
                         '\n)')
                 except sqlite3.OperationalError as err:
@@ -54,10 +50,17 @@ class Database:
             table: str,
             elems: dict[str, Any]) -> None:
         elems = elems.items()
+        print("{}INSERT OR REPLACE INTO {}({}) values({}){}".format(
+            ansi_color['turquoise']['text'] + ansi_effect['italic'],
+            table,
+            ', '.join(i[0] for i in elems),
+            ', '.join("'" + str(i[1]) + "'" for i in elems),
+            ansi_effect['break']))
         self.cur.execute("INSERT OR REPLACE INTO {}({}) values({})".format(
             table,
-            ''.join(i[0] for i in elems),
-            (''.join(str(i[1]) for i in elems))))
+            ', '.join(i[0] for i in elems),
+            ', '.join('?' * len(elems))), [i[1] for i in elems])
+        self.conn.commit()
         return None
 
     def __del__(self) -> None:
