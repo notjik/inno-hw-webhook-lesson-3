@@ -10,6 +10,7 @@ import os
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
+from aiogram.utils.exceptions import BotBlocked
 from dotenv import load_dotenv
 from text_utils import ansi_color, ansi_effect, logging
 from db import Database
@@ -45,7 +46,7 @@ async def startup(callback):
                 'desc': 'integer primary key autoincrement not null',
             },
             {
-                'name': 'user_id',
+                'name': 'userid',
                 'desc': 'integer unique',
             },
             {
@@ -102,14 +103,14 @@ async def start_message(msg: types.Message):
     """
     global db
     elems = {
-        'user_id': msg.from_user.id,
+        'userid': msg.from_user.id,
         'username': msg.from_user.username,
         'firstname': msg.from_user.first_name,
         'lastname': msg.from_user.last_name,
     }
     db.add('users', elems)
     logging(msg, '/start', '{}'.format(msg))
-    await msg.answer('Hi! Welcome to the bot from the webhooks homework of Innopolis University. \n'
+    await msg.answer('Hi! Welcome to the bot from the webhooks homework №2 of Innopolis University. \n'
                      'This is an echo bot.')  # Request with a message to the user
 
 
@@ -137,6 +138,14 @@ async def echo(msg: types.Message):
     await bot.copy_message(chat_id=msg.chat.id,
                            from_chat_id=msg.chat.id,
                            message_id=msg.message_id)  # Request to copy a message
+
+
+@dispatcher.errors_handler(exception=BotBlocked)
+async def except_bot_blocked(update: types.Update, exception: BotBlocked):
+    global db
+    db.delete('users', conjunction={'userid': update.message.from_user.id})
+    print('User {} blocked me.\nError name: {}'.format(update.message.from_user, exception))
+    return True
 
 
 # Entry point

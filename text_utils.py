@@ -1,5 +1,7 @@
 import re
+
 from aiogram import types
+from typing import AnyStr
 
 # ANSI EFFECT CODE
 ansi_effect = {
@@ -56,8 +58,8 @@ ansi_color = {
 
 
 def logging(message: types.Message,
-            type_content: str,
-            content: str) -> None:
+            type_content: AnyStr,
+            content: AnyStr) -> None:
     """
     Procedure for logging actions with the bot to the console.
     :param message: message object
@@ -81,3 +83,7 @@ def logging(message: types.Message,
     with open('logging.log', 'a', encoding="utf-8") as logfile:
         logfile.writelines(re.sub(r'\033\[\d+m', r'', log))  # Logging message in logfile
     print(log)  # Logging message in console
+
+
+def add_brackets(string: AnyStr) -> AnyStr:
+    return '(' + string + ')'

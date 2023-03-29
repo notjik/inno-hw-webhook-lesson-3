@@ -1,13 +1,13 @@
 import sqlite3
 
-from typing import Any
-from text_utils import ansi_color, ansi_effect
+from typing import Any, List, AnyStr, Dict
+from text_utils import ansi_color, ansi_effect, add_brackets
 
 
 class Database:
     def __init__(self,
-                 db_name: str,
-                 table_template: dict[str, list[dict[str, str]]] | str) -> None:
+                 db_name: AnyStr,
+                 table_template: Dict[AnyStr, List[Dict[AnyStr, AnyStr]]] | AnyStr) -> None:
         self.conn = sqlite3.connect(db_name)
         self.cur = self.conn.cursor()
         if isinstance(table_template, dict):
@@ -47,19 +47,39 @@ class Database:
         self.conn.commit()
 
     def add(self,
-            table: str,
-            elems: dict[str, Any]) -> None:
+            table: AnyStr,
+            elems: Dict[AnyStr, Any]) -> None:
         elems = elems.items()
-        print("{}INSERT OR REPLACE INTO {}({}) values({}){}".format(
-            ansi_color['turquoise']['text'] + ansi_effect['italic'],
+        str_operation = "INSERT OR REPLACE INTO {}({}) values({})".format(
             table,
             ', '.join(i[0] for i in elems),
-            ', '.join("'" + str(i[1]) + "'" for i in elems),
-            ansi_effect['break']))
-        self.cur.execute("INSERT OR REPLACE INTO {}({}) values({})".format(
-            table,
-            ', '.join(i[0] for i in elems),
-            ', '.join('?' * len(elems))), [i[1] for i in elems])
+            ', '.join('?' * len(elems)))
+        print(ansi_color['white']['text'] + ansi_effect['italic'] + str_operation + ansi_effect['break'])
+        self.cur.execute(str_operation, [i[1] for i in elems])
+        self.conn.commit()
+        return None
+
+    def delete(self,
+               table: AnyStr,
+               *,
+               conjunction: Dict[AnyStr, Any] = {},
+               disjunction: Dict[AnyStr, Any] = {}) -> None:
+        conjunction = conjunction.items()
+        disjunction = disjunction.items()
+        if conjunction == disjunction == {}:
+            print(ansi_color['red']['text'] + ansi_effect['bold'] +
+                  "Incorrect data transmitted for the operation."
+                  + ansi_effect['break'])
+        str_conjunction = " AND ".join("{} = ?".format(i[0]) for i in conjunction)
+        str_disjunction = " OR ".join("{} = ?".format(i[0]) for i in disjunction)
+        str_operation = "DELETE FROM {} WHERE ".format(table) + \
+                        " AND ".join(filter(lambda x: x != '',
+                                            [add_brackets(str_conjunction) if len(
+                                                conjunction) > 1 else str_conjunction,
+                                             add_brackets(str_disjunction) if len(
+                                                 disjunction) > 1 else str_disjunction]))
+        print(ansi_color['white']['text'] + ansi_effect['italic'] + str_operation + ansi_effect['break'])
+        self.cur.execute(str_operation, [i[1] for i in conjunction] + [i[1] for i in disjunction])
         self.conn.commit()
         return None
 
