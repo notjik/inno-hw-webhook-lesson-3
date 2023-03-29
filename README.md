@@ -8,7 +8,7 @@
 
 ## Hosted by [goormIDE](https://ide.goorm.io)
 
-### [@innopolistwebhook2bot](https://t.me/innopolistwebhook2bot)
+### [@innopolistwebhook3bot](https://t.me/innopolistwebhook3bot)
 
 ---
 
@@ -24,7 +24,7 @@
 
 ### Размещено на [goormIDE](https://ide.goorm.io)
 
-### [@innopolistwebhook2bot](https://t.me/innopolistwebhook2bot)
+### [@innopolistwebhook3bot](https://t.me/innopolistwebhook3bot)
 
 ---
 
