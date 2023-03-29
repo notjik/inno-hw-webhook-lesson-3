@@ -1,5 +1,5 @@
 """
-Реализовать эхо бота использующего webhook.
+Добавить в бота реализацию работы с SQLite.
 """
 # *You need to download: "aiogram", "python-dotenv"*
 # *You need to add a token, host, path to the environment variable*

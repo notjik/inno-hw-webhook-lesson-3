@@ -86,4 +86,9 @@ def logging(message: types.Message,
 
 
 def add_brackets(string: AnyStr) -> AnyStr:
+    """
+    Add brackets in your string
+    :param string:
+    :return: string with brackets
+    """
     return '(' + string + ')'

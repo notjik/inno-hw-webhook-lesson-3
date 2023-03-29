@@ -6,7 +6,9 @@
 
 # Bot from the lesson of the course "Code Future" of Innopolis University
 
-## [@innopolistwebhook2bot](https://t.me/innopolistwebhook2bot)
+## Hosted by [goormIDE](https://ide.goorm.io)
+
+### [@innopolistwebhook2bot](https://t.me/innopolistwebhook2bot)
 
 ---
 
@@ -20,7 +22,9 @@
 
 # Бот из урока курса "Код будущего" Университета Иннополис
 
-## [@innopolistwebhook2bot](https://t.me/innopolistwebhook2bot)
+### Размещено на [goormIDE](https://ide.goorm.io)
+
+### [@innopolistwebhook2bot](https://t.me/innopolistwebhook2bot)
 
 ---
 
