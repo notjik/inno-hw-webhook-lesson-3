@@ -1,13 +1,13 @@
 import sqlite3
 
-from typing import Any, List, AnyStr, Dict
+from typing import Any, List, AnyStr, Dict, Union
 from text_utils import ansi_color, ansi_effect, add_brackets
 
 
 class Database:
     def __init__(self,
                  db_name: AnyStr,
-                 db_template: Dict[AnyStr, List[Dict[AnyStr, AnyStr]]] | AnyStr) -> None:
+                 db_template: Union[Dict[AnyStr, List[Dict[AnyStr, AnyStr]]], AnyStr]) -> None:
         """
         Creating a database object and connecting to her
         :param db_name: string name database

@@ -9,8 +9,7 @@ import os
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
-from aiogram.utils import executor
-from aiogram.utils.exceptions import BotBlocked
+from aiogram.utils import executor, exceptions
 from dotenv import load_dotenv
 from text_utils import ansi_color, ansi_effect, logging
 from db import Database
@@ -140,11 +139,11 @@ async def echo(msg: types.Message):
                            message_id=msg.message_id)  # Request to copy a message
 
 
-@dispatcher.errors_handler(exception=BotBlocked)
-async def except_bot_blocked(update: types.Update, exception: BotBlocked):
+@dispatcher.errors_handler(exception=exceptions.BotBlocked)
+async def except_bot_blocked(update: types.Update, exception: exceptions.BotBlocked):
     global db
     db.delete('users', conjunction={'userid': update.message.from_user.id})
-    print('User {} blocked me.\nError name: {}'.format(update.message.from_user, exception))
+    logging(update.message, 'the bot to the ban', '{}'.format(exception))
     return True
 
 
